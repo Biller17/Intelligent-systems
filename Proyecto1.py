@@ -5,7 +5,7 @@ import copy
 
 
 class Node:
-    def __init__(self, boardState, moveDone, father = None,isVisited = 0 ):
+    def __init__(self, boardState, moveDone, father,isVisited):
         self.boardState = boardState
         self.moveDone = moveDone
         self.isVisited = isVisited
@@ -53,7 +53,7 @@ class Node:
         print("possible moves",len(possibleMoves))
         print(len(self.childNodes))
         for i in range(len(possibleMoves)):
-            self.childNodes.append(Node(self.getNewBoard(possibleMoves[i]), possibleMoves[i],self))
+            self.childNodes.append(Node(self.getNewBoard(possibleMoves[i]), possibleMoves[i],self, 0))
 
         return self.childNodes
 
@@ -78,6 +78,15 @@ class Node:
         #     print(newBoard[i])
         return newBoard
 
+    def returnSolutionMove(self,moveset):
+
+
+        print(moveset)
+        if(self.father == None):
+            return moveset
+        else:
+            moveset.insert(0,self.moveDone)
+            self.father.returnSolutionMove(moveset)
 
 
 def breadthFirstSearch(initialBoard, finalBoard):
@@ -85,24 +94,29 @@ def breadthFirstSearch(initialBoard, finalBoard):
     #funciona con insert(0, item) y pop
     foundFinalBoard = False
     queue = []
-    root = Node(initialBoard,"")
+    root = Node(initialBoard,"", None, 0)
     queue.insert(0, root)
     numberOfActions = 0
     while(foundFinalBoard != True):
-        print("number of Actions",numberOfActions)
+        # print("number of Actions",numberOfActions)
         currentNode = queue.pop()
         print("board: ", numberOfActions)
         # currentNode.printBoardState()
         if(currentNode.boardState != finalBoard):
             children = currentNode.createChildren()
             for i in range(len(children)):
+                print("child")
                 currentNode.printBoardState()
+                print("\n")
                 queue.insert(0, children[i])
         else:
             foundFinalBoard = True
-            print("foundFinalBoard")
+
+            print("Found Solution! ")
+            print(currentNode.returnSolutionMove([]))
 
         numberOfActions+=1
+
 
 
 
@@ -114,34 +128,34 @@ def dephFirstSearch():
 if __name__ == '__main__':
     edoFinal = [[1,2,3],[4,5,6],[7,8,0]]
 
-    edoInicial = [[0,1,2],[3,4,5],[6,7,8]]
+    edoInicial = [[0,1,2],[4,5,3],[7,8,6]]
     print("Proyecto 1 8-Puzzle Adrian Biller A01018940")
-    # breadthFirstSearch(edoInicial, edoFinal)
-    root = Node(edoInicial, "")
-    children = root.createChildren()
-    print("father")
-    root.printBoardState()
-    for i in range(len(children)):
-        print("\nchild", i)
-        print(children[i].moveDone)
-        children[i].printBoardState()
-    secondChildren = children[1].createChildren()
-
-    print("\nfather")
-    children[1].printBoardState()
-    print("new children", len(secondChildren))
-    for i in range(len(secondChildren)):
-        print("\nchild2", i)
-        secondChildren[i].printBoardState()
-        print(secondChildren[i].moveDone)
-
-
-    print("prueba\n")
-    secondChildren[3].printBoardState()
-
-    newnewChildren = secondChildren[3].createChildren()
-    print("newnewChildren length", len(newnewChildren))
-    for i in range(len(newnewChildren)):
-        print("\nchild3 ", i)
-        print(newnewChildren[i].moveDone)
-        newnewChildren[i].printBoardState()
+    breadthFirstSearch(edoInicial, edoFinal)
+    # root = Node(edoInicial, "")
+    # children = root.createChildren()
+    # print("father")
+    # root.printBoardState()
+    # for i in range(len(children)):
+    #     print("\nchild", i)
+    #     print(children[i].moveDone)
+    #     children[i].printBoardState()
+    # secondChildren = children[1].createChildren()
+    #
+    # print("\nfather")
+    # children[1].printBoardState()
+    # print("new children", len(secondChildren))
+    # for i in range(len(secondChildren)):
+    #     print("\nchild2", i)
+    #     secondChildren[i].printBoardState()
+    #     print(secondChildren[i].moveDone)
+    #
+    #
+    # print("prueba\n")
+    # secondChildren[1].printBoardState()
+    #
+    # newnewChildren = secondChildren[1].createChildren()
+    # print("newnewChildren length", len(newnewChildren))
+    # for i in range(len(newnewChildren)):
+    #     print("\nchild3 ", i)
+    #     print(newnewChildren[i].moveDone)
+    #     newnewChildren[i].printBoardState()
