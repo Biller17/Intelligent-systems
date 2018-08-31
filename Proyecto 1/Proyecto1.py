@@ -3,7 +3,7 @@
 
 import copy
 import random
-
+import time
 
 
 #Node class for all nodes in the search tree
@@ -95,11 +95,20 @@ class Node:
 
 
 
-#breadth first search algorithm implementing queue
 
+def checkIfVisited(node, nodeArray):
+    for i in range(len(nodeArray)):
+        if(node.boardState == nodeArray[i].boardState):
+            return 1
+    return 0
+
+
+
+#breadth first search algorithm implementing queue
 def breadthFirstSearch(initialBoard, finalBoard):
     #this will be the queue array to check the nodes
     queue = []
+    visitedNodes = []
     foundFinalBoard = False
     root = Node(initialBoard,"", None, 0)
     queue.insert(0, root)
@@ -109,12 +118,14 @@ def breadthFirstSearch(initialBoard, finalBoard):
         print("board: ", numberOfActions)
         #if current node does not have the answer then expand and create children with possible moves and add them to the queue
         if(currentNode.boardState != finalBoard):
+            visitedNodes.append(currentNode)
             children = currentNode.createChildren()
             for i in range(len(children)):
                 # print("child")
                 # currentNode.printBoardState()
                 # print("\n")
-                queue.insert(0, children[i])
+                if(checkIfVisited(children[i], visitedNodes) == 0):
+                    queue.insert(0, children[i])
         else:
             foundFinalBoard = True
 
@@ -127,11 +138,12 @@ def breadthFirstSearch(initialBoard, finalBoard):
 
 
 
-def dephFirstSearch(initialBoard, finalBoard):
+def depthFirstSearch(initialBoard, finalBoard):
     #this will be the queue array to check the nodes
     #funciona con insert(0, item) y pop
     foundFinalBoard = False
     stack = []
+    visitedNodes = []
     root = Node(initialBoard,"", None, 0)
     stack.insert(0, root)
     numberOfActions = 0
@@ -143,12 +155,14 @@ def dephFirstSearch(initialBoard, finalBoard):
         #if current node does not have the answer then expand and create children with possible moves and add them to the stack
         if(currentNode.boardState != finalBoard):
             children = currentNode.createChildren()
+            visitedNodes.append(currentNode)
             random.shuffle(children)
             for i in range(len(children)):
                 # print("child")
                 # currentNode.printBoardState()
                 # print("\n")
-                stack.append(children[i])
+                if(checkIfVisited(children[i], visitedNodes) == 0):
+                    stack.append(children[i])
         else:
             foundFinalBoard = True
 
@@ -161,18 +175,23 @@ def dephFirstSearch(initialBoard, finalBoard):
 
 
 def busquedaNoInformada(edoInicial, edoFinal, algoritmo):
-     if(algoritmo == 0):
+    start_time = time.time()
+    if(algoritmo == '0'):
          #breadthFirstSearch
-         breadthFirstSearch(edoInicial, edoFinal)
-     else:
-        dephFirstSearch(edoInicial, edoFinal)
+        breadthFirstSearch(edoInicial, edoFinal)
+    else:
+        depthFirstSearch(edoInicial, edoFinal)
+    print("El programa tomó %s segundos " % (time.time() - start_time))
 
 if __name__ == '__main__':
     edoFinal = [[1,2,3],[4,5,6],[7,8,0]]
 
     edoInicial = [[0,1,2],[4,5,3],[7,8,6]]
     print("Proyecto 1 8-Puzzle Adrian Biller A01018940")
+
+    option = input("0 Para Breadth first search / 1 para Deph first search\n")
+
     # breadthFirstSearch(edoInicial, edoFinal)
     # dephFirstSearch(edoInicial,edoFinal)
-    option = input("0 Para Breadth first search / 1 para Deph first search\n")
     busquedaNoInformada(edoInicial, edoFinal, option)
+    # main()
