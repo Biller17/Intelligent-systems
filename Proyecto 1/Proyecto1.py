@@ -130,7 +130,7 @@ def breadthFirstSearch(initialBoard, finalBoard):
             foundFinalBoard = True
 
             print("Found Solution! ")
-            print(currentNode.returnSolutionMove([]))
+            return currentNode.returnSolutionMove([])
 
         numberOfActions+=1
 
@@ -167,7 +167,8 @@ def depthFirstSearch(initialBoard, finalBoard):
             foundFinalBoard = True
 
             print("Found Solution! ")
-            print(currentNode.returnSolutionMove([]))
+            return currentNode.returnSolutionMove([])
+
 
         numberOfActions+=1
 
@@ -176,12 +177,15 @@ def depthFirstSearch(initialBoard, finalBoard):
 
 def busquedaNoInformada(edoInicial, edoFinal, algoritmo):
     start_time = time.time()
+    solution = []
     if(algoritmo == '0'):
          #breadthFirstSearch
-        breadthFirstSearch(edoInicial, edoFinal)
+        solution = breadthFirstSearch(edoInicial, edoFinal)
+        print("El programa tomó %s segundos " % (time.time() - start_time))
     else:
-        depthFirstSearch(edoInicial, edoFinal)
-    print("El programa tomó %s segundos " % (time.time() - start_time))
+        solution = depthFirstSearch(edoInicial, edoFinal)
+        print("El programa tomó %s segundos " % (time.time() - start_time))
+    return solution
 
 if __name__ == '__main__':
     edoFinal = [[1,2,3],[4,5,6],[7,8,0]]
@@ -193,5 +197,5 @@ if __name__ == '__main__':
 
     # breadthFirstSearch(edoInicial, edoFinal)
     # dephFirstSearch(edoInicial,edoFinal)
-    busquedaNoInformada(edoInicial, edoFinal, option)
+    print(busquedaNoInformada(edoInicial, edoFinal, option))
     # main()
