@@ -32,6 +32,20 @@ class Node:
         return  posY, posX
 
 
+
+    def checkH1(self, finalBoard):
+        heuristic = 0
+        for i in range(len(self.boardState)):
+            for j in range(len(self.boardState[i])):
+                if(self.boardState[i][j] != finalBoard[i][j]):
+                    heuristic += 1
+        self.heuristic = heuristic
+        return heuristic
+
+    def checkH2(self, finalBoard):
+        print("checking heuristic 2")
+
+
 #returns an array of all possible moves in current zero position
     def checkPossibleMoves(self):
         posY, posX = self.getBlankPosition()
@@ -104,8 +118,39 @@ def checkIfVisited(node, nodeArray):
 
 
 
-#breadth first search algorithm implementing queue
-def breadthFirstSearch(initialBoard, finalBoard):
+def prioritizeNodes(queue):
+    print("this function will sort the nodes depending on their heuristic")
+    quicksort(queue, 0, len(queue)-1)
+    return 0
+
+
+def quicksort(array, left, right):
+    if(left >= right):
+        return 0
+    pivot = array[ int((left + right) / 2)]
+    index = partition(array, left, right, pivot)
+    quicksort(array, left, index -1)
+    quicksort(array, index, right)
+
+
+def partition(array, left, right):
+    while(left <= right):
+        while(array[left].heuristic < pivot.heuristic ):
+            left += 1
+        while(array[right].heuristic > pivot.heuristic):
+            right -= 1
+        if(let <= right):
+            temp = array[left]
+            array[left] = array[right]
+            array[right] = temp
+            left += 1
+            right -= 1
+    return left 
+
+
+
+#a* algorithm with heuristic of out of place numbers
+def astarH1(initialBoard, finalBoard):
     #this will be the queue array to check the nodes
     queue = []
     visitedNodes = []
@@ -125,7 +170,9 @@ def breadthFirstSearch(initialBoard, finalBoard):
                 # currentNode.printBoardState()
                 # print("\n")
                 if(checkIfVisited(children[i], visitedNodes) == 0):
+                    print(children[i].checkH1(finalBoard))
                     queue.insert(0, children[i])
+            prioritizeNodes(queue)
         else:
             foundFinalBoard = True
 
@@ -136,41 +183,41 @@ def breadthFirstSearch(initialBoard, finalBoard):
 
 
 
-
-
-def depthFirstSearch(initialBoard, finalBoard):
+#a* algorithm with heuristic of mannhatan distances
+def astarH2(initialBoard, finalBoard):
     #this will be the queue array to check the nodes
-    #funciona con insert(0, item) y pop
-    foundFinalBoard = False
-    stack = []
+    queue = []
     visitedNodes = []
+    foundFinalBoard = False
     root = Node(initialBoard,"", None, 0)
-    stack.insert(0, root)
+    queue.insert(0, root)
     numberOfActions = 0
     while(foundFinalBoard != True):
-        # print("number of Actions",numberOfActions)
-        currentNode = stack.pop()
+        currentNode = queue.pop()
         print("board: ", numberOfActions)
-        # currentNode.printBoardState()
-        #if current node does not have the answer then expand and create children with possible moves and add them to the stack
+        #if current node does not have the answer then expand and create children with possible moves and add them to the queue
         if(currentNode.boardState != finalBoard):
-            children = currentNode.createChildren()
             visitedNodes.append(currentNode)
-            random.shuffle(children)
+            children = currentNode.createChildren()
             for i in range(len(children)):
                 # print("child")
                 # currentNode.printBoardState()
                 # print("\n")
                 if(checkIfVisited(children[i], visitedNodes) == 0):
-                    stack.append(children[i])
+                    children[i].checkH2(finalBoard)
+                    queue.insert(0, children[i])
+
+            prioritizeNodes(queue)
         else:
             foundFinalBoard = True
 
             print("Found Solution! ")
             return currentNode.returnSolutionMove([])
 
-
         numberOfActions+=1
+
+
+
 
 
 
@@ -178,13 +225,13 @@ def depthFirstSearch(initialBoard, finalBoard):
 def busquedaAstar(edoInicial, edoFinal, heuristica):
     start_time = time.time()
     solution = []
-    if(algoritmo == '0'):
+    if(heuristica == '0'):
          #numero de cuadros fuera de su lugar
-        solution = breadthFirstSearch(edoInicial, edoFinal)
+        solution = astarH1(edoInicial, edoFinal)
         print("El programa tomó %s segundos " % (time.time() - start_time))
     else:
         #numero de distancias mannhatan
-        solution = depthFirstSearch(edoInicial, edoFinal)
+        solution = astarH2(edoInicial, edoFinal)
         print("El programa tomó %s segundos " % (time.time() - start_time))
     return solution
 
@@ -194,9 +241,9 @@ if __name__ == '__main__':
     edoInicial = [[0,1,2],[4,5,3],[7,8,6]]
     print("Proyecto 1 8-Puzzle Adrian Biller A01018940")
 
-    option = input("0 Para Breadth first search / 1 para Deph first search\n")
+    option = input("0 Para usar heuristica de numero de bloques fuera de lugar \n1 para usar heuristica de distancias mannhatan\n")
 
     # breadthFirstSearch(edoInicial, edoFinal)
     # dephFirstSearch(edoInicial,edoFinal)
-    print(busquedaNoInformada(edoInicial, edoFinal, option))
+    print(busquedaAstar(edoInicial, edoFinal, option))
     # main()
