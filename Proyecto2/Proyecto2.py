@@ -119,9 +119,9 @@ def checkIfVisited(node, nodeArray):
 
 
 def prioritizeNodes(queue):
-    print("this function will sort the nodes depending on their heuristic")
     quicksort(queue, 0, len(queue)-1)
-    return 0
+    # for i in range(len(queue)):
+    #     print("h:", queue[i].heuristic, end="")
 
 
 def quicksort(array, left, right):
@@ -133,19 +133,19 @@ def quicksort(array, left, right):
     quicksort(array, index, right)
 
 
-def partition(array, left, right):
+def partition(array, left, right, pivot):
     while(left <= right):
         while(array[left].heuristic < pivot.heuristic ):
             left += 1
         while(array[right].heuristic > pivot.heuristic):
             right -= 1
-        if(let <= right):
+        if(left <= right):
             temp = array[left]
             array[left] = array[right]
             array[right] = temp
             left += 1
             right -= 1
-    return left 
+    return left
 
 
 
@@ -159,7 +159,7 @@ def astarH1(initialBoard, finalBoard):
     queue.insert(0, root)
     numberOfActions = 0
     while(foundFinalBoard != True):
-        currentNode = queue.pop()
+        currentNode = queue.pop(0)
         print("board: ", numberOfActions)
         #if current node does not have the answer then expand and create children with possible moves and add them to the queue
         if(currentNode.boardState != finalBoard):
@@ -194,6 +194,7 @@ def astarH2(initialBoard, finalBoard):
     numberOfActions = 0
     while(foundFinalBoard != True):
         currentNode = queue.pop()
+        print("current node", currentNode.heuristic)
         print("board: ", numberOfActions)
         #if current node does not have the answer then expand and create children with possible moves and add them to the queue
         if(currentNode.boardState != finalBoard):
