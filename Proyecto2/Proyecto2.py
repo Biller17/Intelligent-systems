@@ -31,7 +31,11 @@ class Node:
                     posX = j
         return  posY, posX
 
-
+    def getValuePosition(self, value, finalBoard):
+        for i in range(len(finalBoard)):
+            for j in range(len(finalBoard)):
+                if(value  == finalBoard[i][j]):
+                    return i, j
 
     def checkH1(self, finalBoard):
         heuristic = 0
@@ -40,10 +44,19 @@ class Node:
                 if(self.boardState[i][j] != finalBoard[i][j]):
                     heuristic += 1
         self.heuristic = heuristic
-        return heuristic
+        # return heuristic
 
     def checkH2(self, finalBoard):
-        print("checking heuristic 2")
+        heuristic = 0
+        for i in range(len(self.boardState)):
+            for j in range(len(self.boardState[i])):
+                x,y = self.getValuePosition(self.boardState[i][j], finalBoard)
+                heuristic += (abs(i - x) + abs(j - y))
+        self.heuristic = heuristic
+
+
+
+        # print("checking heuristic 2")
 
 
 #returns an array of all possible moves in current zero position
@@ -193,7 +206,7 @@ def astarH2(initialBoard, finalBoard):
     queue.insert(0, root)
     numberOfActions = 0
     while(foundFinalBoard != True):
-        currentNode = queue.pop()
+        currentNode = queue.pop(0)
         print("current node", currentNode.heuristic)
         print("board: ", numberOfActions)
         #if current node does not have the answer then expand and create children with possible moves and add them to the queue
