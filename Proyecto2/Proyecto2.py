@@ -206,7 +206,7 @@ def astarH2(initialBoard, finalBoard):
     queue.insert(0, root)
     numberOfActions = 0
     while(foundFinalBoard != True):
-        currentNode = queue.pop(0)
+        currentNode = queue.pop()
         print("current node", currentNode.heuristic)
         print("board: ", numberOfActions)
         #if current node does not have the answer then expand and create children with possible moves and add them to the queue
