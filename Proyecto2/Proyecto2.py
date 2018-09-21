@@ -17,6 +17,7 @@ class Node:
         self.heuristic = 0
 
 
+
     def printBoardState(self):
         for i in range(len(self.boardState)):
             print(self.boardState[i])
@@ -39,20 +40,22 @@ class Node:
 
     def checkH1(self, finalBoard):
         heuristic = 0
+        length = self.getAccumulatedPathWeight(0)
         for i in range(len(self.boardState)):
             for j in range(len(self.boardState[i])):
                 if(self.boardState[i][j] != finalBoard[i][j]):
                     heuristic += 1
-        self.heuristic = heuristic
+        self.heuristic = heuristic + length
         # return heuristic
 
     def checkH2(self, finalBoard):
         heuristic = 0
+        length = self.getAccumulatedPathWeight(0)
         for i in range(len(self.boardState)):
             for j in range(len(self.boardState[i])):
                 x,y = self.getValuePosition(self.boardState[i][j], finalBoard)
                 heuristic += (abs(i - x) + abs(j - y))
-        self.heuristic = heuristic
+        self.heuristic = heuristic + length
 
 
 
@@ -119,6 +122,13 @@ class Node:
             moveset.insert(0,self.moveDone)
             self.father.returnSolutionMove(moveset)
         return moveset
+
+    def getAccumulatedPathWeight(self, length):
+        if(self.father == None):
+            return length
+        else:
+            self.father.getAccumulatedPathWeight(length + 1)
+        return length
 
 
 
