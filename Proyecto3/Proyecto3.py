@@ -7,70 +7,6 @@ import math
 import time
 
 
-#Node class for all nodes in the search tree
-class Node:
-    def __init__(self, board, queensAttacking):
-        self.board = board
-        self.queensAttacking = queensAttacking
-        self.childNodes = []
-
-
-
-
-
-#returns an array of all possible moves in current zero position
-    def checkPossibleMoves(self):
-        posY, posX = self.getBlankPosition()
-        moves = []
-        #check Up
-        if(posY -1 >= 0):
-            moves.append("U")
-            #up is possible
-        #check Down
-        if(posY +1 <= len(self.boardState)-1):
-            moves.append("D")
-        #check Right
-        if(posX +1 <= len(self.boardState[0])-1):
-            moves.append("R")
-        #check Left
-        if(posX -1 >= 0):
-            moves.append("L")
-        # print(moves)
-        # self.createChildren(moves)
-        return moves
-
-#creates and returns an array of all the possible moves sent to the child nodes including the new board position
-    def createChildren(self):
-        possibleMoves = self.checkPossibleMoves()
-        # print(possibleMoves)
-        # print("possible moves",len(possibleMoves))
-        for i in range(len(possibleMoves)):
-            self.childNodes.append(Node(self.getNewBoard(possibleMoves[i]), possibleMoves[i],self, 0))
-        return self.childNodes
-
-#reads the move specified and changes board accordingly
-    def getNewBoard(self,move):
-        posY, posX = self.getBlankPosition()
-        newBoard = copy.deepcopy(self.boardState)
-        if(move == "U"):
-            newBoard[posY][posX] = newBoard[posY-1][posX]
-            newBoard[posY-1][posX] = 0
-        if(move == "D"):
-            newBoard[posY][posX] = newBoard[posY+1][posX]
-            newBoard[posY+1][posX] = 0
-        if(move == "R"):
-            newBoard[posY][posX] = newBoard[posY][posX+1]
-            newBoard[posY][posX+1] = 0
-        if(move == "L"):
-            newBoard[posY][posX] = newBoard[posY][posX-1]
-            newBoard[posY][posX-1] = 0
-
-        # for i in range(len(newBoard)):
-        #     print(newBoard[i])
-        return newBoard
-
-
-
 
 def getQueens(board):
     queens = []
@@ -105,8 +41,8 @@ def printBoard(board):
         print(board[i])
 
 
-def getPossibleMoves(position, lateral, size):
-    print(position)
+def getPossibleMoves(position, size):
+    # print(position)
     moves = []
     if(position[0] -1 >= 0):
         moves.append((position[0]-1, position[1]))
@@ -118,16 +54,54 @@ def getPossibleMoves(position, lateral, size):
 
 
 
-def hillClimbing(N, board, lateral, M):
-    #this will be the queue array to check the nodes
+def getNewBoard(oldPos, newPos, board):
+    print("old board")
     printBoard(board)
+    temp = copy.deepcopy(board)
+    temp[oldPos[0]][oldPos[1]] = 0
+    temp[newPos[0]][newPos[1]] = 1
+    print("new board")
+    printBoard(temp)
+    return temp
+
+def checkIfVisited(visitedList, board):
+    for i in range(len(visitedList)):
+        if(visitedList[i] == board):
+            print("ya fue visitado")
+            return True
+    return False
+
+
+
+def hillClimbing(N, board, lateral, M):
+    visited = []
     evaluation = evaluationFunction(board)
     queenPositions = getQueens(board)
-
-    print("moves with:", queenPositions[0] , "\n", getPossibleMoves(queenPositions[0], lateral, N))
-    
+    bestNeighbor = board
     while(evaluation != 0):
+        print("*********************************************************** EVALUATION", evaluation, "******************************************")
         for i in range(len(queenPositions)):
+            currentNeighbor = queenPositions.pop(0)
+            possibleMoves = getPossibleMoves(currentNeighbor, N)
+            for j in range(len(possibleMoves)):
+                tempBoard = getNewBoard(currentNeighbor, possibleMoves[j], board)
+                if(checkIfVisited(visited,tempBoard)):
+                    continue
+                neighborEvaluation = evaluationFunction(board)
+                if(neighborEvaluation <= evaluation and lateral):
+                    bestNeighbor = tempBoard
+                    evaluation = neighborEvaluation
+                elif(neighborEvaluation < evaluation):
+                    bestNeighbor = tempBoard
+                    evaluation = neighborEvaluation
+            visited.append(tempBoard)
+        board = bestNeighbor
+        queenPositions = getQueens(board)
+
+        # queenPositions = getQueens(board)
+            # for j in range(len(currentNeighbor[i])):
+            #     print(queenPositions[i])
+    #     for i in range(len(queenPositions)):
 
 
 
