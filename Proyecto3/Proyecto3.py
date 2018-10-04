@@ -9,58 +9,13 @@ import time
 
 #Node class for all nodes in the search tree
 class Node:
-    def __init__(self, boardState, moveDone, father,isVisited):
-        self.boardState = boardState
-        self.moveDone = moveDone
-        self.isVisited = isVisited
-        self.father = father
+    def __init__(self, board, queensAttacking):
+        self.board = board
+        self.queensAttacking = queensAttacking
         self.childNodes = []
-        self.heuristic = 0
 
 
 
-    def printBoardState(self):
-        for i in range(len(self.boardState)):
-            print(self.boardState[i])
-
-
-#gets matrix position of zero in the board
-    def getBlankPosition(self):
-        for i in range(len(self.boardState)):
-            for j in range(len(self.boardState[i])):
-                if(self.boardState[i][j] == 0):
-                    posY = i
-                    posX = j
-        return  posY, posX
-
-    def getValuePosition(self, value, finalBoard):
-        for i in range(len(finalBoard)):
-            for j in range(len(finalBoard)):
-                if(value  == finalBoard[i][j]):
-                    return i, j
-
-    def checkH1(self, finalBoard):
-        heuristic = 0
-        length = self.getAccumulatedPathWeight(0)
-        for i in range(len(self.boardState)):
-            for j in range(len(self.boardState[i])):
-                if(self.boardState[i][j] != finalBoard[i][j]):
-                    heuristic += 1
-        self.heuristic = heuristic + length
-        # return heuristic
-
-    def checkH2(self, finalBoard):
-        heuristic = 0
-        length = self.getAccumulatedPathWeight(0)
-        for i in range(len(self.boardState)):
-            for j in range(len(self.boardState[i])):
-                x,y = self.getValuePosition(self.boardState[i][j], finalBoard)
-                heuristic += (abs(i - x) + abs(j - y))
-        self.heuristic = heuristic + length
-
-
-
-        # print("checking heuristic 2")
 
 
 #returns an array of all possible moves in current zero position
@@ -114,97 +69,98 @@ class Node:
         #     print(newBoard[i])
         return newBoard
 
-#recursive function that returns all the moves done to reach the node with the solution
-    def returnSolutionMove(self,moveset):
-        # print(moveset)
-        if(self.father == None):
-            return moveset
-        else:
-            moveset.insert(0,self.moveDone)
-            self.father.returnSolutionMove(moveset)
-        return moveset
-
-    def getAccumulatedPathWeight(self, length):
-        if(self.father == None):
-            return length
-        else:
-            self.father.getAccumulatedPathWeight(length + 1)
-        return length
 
 
 
-
-def checkIfVisited(node, nodeArray):
-    for i in range(len(nodeArray)):
-        if(node.boardState == nodeArray[i].boardState):
-            return 1
-    return 0
-
-
-
-def prioritizeNodes(queue):
-    quicksort(queue, 0, len(queue)-1)
-    # for i in range(len(queue)):
-    #     print("h:", queue[i].heuristic, end="")
+def getQueens(board):
+    queens = []
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if(board[i][j] == 1):
+                queens.append((i,j))
+    return queens
 
 
-def quicksort(array, left, right):
-    if(left >= right):
-        return 0
-    pivot = array[ int((left + right) / 2)]
-    index = partition(array, left, right, pivot)
-    quicksort(array, left, index -1)
-    quicksort(array, index, right)
-
-
-def partition(array, left, right, pivot):
-    while(left <= right):
-        while(array[left].heuristic < pivot.heuristic ):
-            left += 1
-        while(array[right].heuristic > pivot.heuristic):
-            right -= 1
-        if(left <= right):
-            temp = array[left]
-            array[left] = array[right]
-            array[right] = temp
-            left += 1
-            right -= 1
-    return left
+def evaluationFunction(board):
+    heuristic = 0
+    queenPositions = getQueens(board)
+    for i in range(len(queenPositions)):
+        currentQueen = queenPositions.pop(0)
+        for j in range(len(queenPositions)):
+            #checking if there are attacks in x axis
+            if(currentQueen[0] == queenPositions[j][0]):
+                heuristic += 1
+            #checking if there are attacks in y axis
+            if(currentQueen[1] == queenPositions[j][1]):
+                heuristic += 1
+            #checking if there are diagonal
+            if(abs(currentQueen[0] - queenPositions[j][0]) == abs(currentQueen[1] - queenPositions[j][1])):
+                heuristic += 1
+    return heuristic
 
 
 
-def hillClimbing(initialBoard, finalBoard):
+def printBoard(board):
+    for i in range(len(board)):
+        print(board[i])
+
+
+def getPossibleMoves(position, lateral, size):
+    print(position)
+    moves = []
+    if(position[0] -1 >= 0):
+        moves.append((position[0]-1, position[1]))
+        #up is possible
+    #check Down
+    if(position[0] +1 <=size-1):
+        moves.append((position[0]+1, position[1]))
+    #check Right
+    if(position[1] +1 <= size-1 and lateral):
+        moves.append((position[0], position[1]+1))
+    #check Left
+    if(position[1] -1 >= 0 and lateral):
+        moves.append((position[0], position[1]-1))
+    # print(moves)
+    # self.createChildren(moves)
+    return moves
+
+
+
+def hillClimbing(N, board, lateral, M):
     #this will be the queue array to check the nodes
-    queue = []
-    visitedNodes = []
-    foundFinalBoard = False
-    root = Node(initialBoard,"", None, 0)
-    queue.insert(0, root)
-    numberOfActions = 0
-    while(foundFinalBoard != True):
-        currentNode = queue.pop(0)
-        print("current node", currentNode.heuristic)
-        print("board: ", numberOfActions)
-        #if current node does not have the answer then expand and create children with possible moves and add them to the queue
-        if(currentNode.boardState != finalBoard):
-            visitedNodes.append(currentNode)
-            children = currentNode.createChildren()
-            for i in range(len(children)):
-                # print("child")
-                # currentNode.printBoardState()
-                # print("\n")
-                if(checkIfVisited(children[i], visitedNodes) == 0):
-                    children[i].checkH2(finalBoard)
-                    queue.insert(0, children[i])
+    evaluation = 1
+    printBoard(board)
+    evaluationFunction(board)
+    queenPositions = getQueens(board)
 
-            prioritizeNodes(queue)
-        else:
-            foundFinalBoard = True
+    print("moves with:", queenPositions[0] , "\n", getPossibleMoves(queenPositions[0], lateral, N))
 
-            print("Found Solution! ")
-            return currentNode.returnSolutionMove([])
+    # root = Node(initialBoard,"", None, 0)
+    # queue.insert(0, root)
 
-        numberOfActions+=1
+    # while(evaluation != 0):
+    #     currentNode = queue.pop(0)
+    #     print("current node", currentNode.heuristic)
+    #     #if current node does not have the answer then expand and create children with possible moves and add them to the queue
+    #     if(currentNode.boardState != finalBoard):
+    #         visitedNodes.append(currentNode)
+    #         children = currentNode.createChildren()
+    #         for i in range(len(children)):
+    #             # print("child")
+    #             # currentNode.printBoardState()
+    #             # print("\n")
+    #             if(checkIfVisited(children[i], visitedNodes) == 0):
+    #                 children[i].checkH2(finalBoard)
+    #                 queue.insert(0, children[i])
+    #
+    #         prioritizeNodes(queue)
+    #     else:
+    #         foundFinalBoard = True
+    #
+    #         print("Found Solution! ")
+    #         return currentNode.returnSolutionMove([])
+    #
+    #     numberOfActions+=1
 
 
 
@@ -213,7 +169,7 @@ def hillClimbing(initialBoard, finalBoard):
 def generateBoard(size):
     board = [[0 for x in range(size)] for y in range(size)]
     for i in range(size):
-        board[i][math.floor(random.uniform(0, size))] = 1
+        board[math.floor(random.uniform(0, size))][i] = 1
     return board
 
 def busquedaHC(N, lateral, M):
@@ -228,5 +184,5 @@ if __name__ == '__main__':
 
     # breadthFirstSearch(edoInicial, edoFinal)
     # dephFirstSearch(edoInicial,edoFinal)
-    print(busquedaHC(10, False, 5))
+    print(busquedaHC(5, False, 5))
     # main()
