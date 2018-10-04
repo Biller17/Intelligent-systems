@@ -114,26 +114,26 @@ def getPossibleMoves(position, lateral, size):
     #check Down
     if(position[0] +1 <=size-1):
         moves.append((position[0]+1, position[1]))
-    #check Right
-    if(position[1] +1 <= size-1 and lateral):
-        moves.append((position[0], position[1]+1))
-    #check Left
-    if(position[1] -1 >= 0 and lateral):
-        moves.append((position[0], position[1]-1))
-    # print(moves)
-    # self.createChildren(moves)
     return moves
 
 
 
 def hillClimbing(N, board, lateral, M):
     #this will be the queue array to check the nodes
-    evaluation = 1
     printBoard(board)
-    evaluationFunction(board)
+    evaluation = evaluationFunction(board)
     queenPositions = getQueens(board)
 
     print("moves with:", queenPositions[0] , "\n", getPossibleMoves(queenPositions[0], lateral, N))
+    
+    while(evaluation != 0):
+        for i in range(len(queenPositions)):
+
+
+
+
+
+
 
     # root = Node(initialBoard,"", None, 0)
     # queue.insert(0, root)
