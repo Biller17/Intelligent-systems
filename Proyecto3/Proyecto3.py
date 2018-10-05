@@ -78,6 +78,8 @@ def hillClimbing(N, board, lateral, M):
     evaluation = evaluationFunction(board)
     queenPositions = getQueens(board)
     bestNeighbor = board
+    numOfResets = 0
+    reset = True
     while(evaluation != 0):
         print("*********************************************************** EVALUATION", evaluation, "******************************************")
         for i in range(len(queenPositions)):
@@ -86,57 +88,28 @@ def hillClimbing(N, board, lateral, M):
             for j in range(len(possibleMoves)):
                 tempBoard = getNewBoard(currentNeighbor, possibleMoves[j], board)
                 if(checkIfVisited(visited,tempBoard)):
-                    continue
-                neighborEvaluation = evaluationFunction(board)
+                    break
+                neighborEvaluation = evaluationFunction(tempBoard)
                 if(neighborEvaluation <= evaluation and lateral):
                     bestNeighbor = tempBoard
                     evaluation = neighborEvaluation
+                    reset = False
                 elif(neighborEvaluation < evaluation):
                     bestNeighbor = tempBoard
                     evaluation = neighborEvaluation
-            visited.append(tempBoard)
-        board = bestNeighbor
-        queenPositions = getQueens(board)
+                    reset = False
 
-        # queenPositions = getQueens(board)
-            # for j in range(len(currentNeighbor[i])):
-            #     print(queenPositions[i])
-    #     for i in range(len(queenPositions)):
+                visited.append(tempBoard)
 
+            if(reset and numOfResets <= M):
+                visited = []
+                board = generateBoard(N)
+                reset = True
+                numOfResets += 1
 
-
-
-
-
-
-    # root = Node(initialBoard,"", None, 0)
-    # queue.insert(0, root)
-
-    # while(evaluation != 0):
-    #     currentNode = queue.pop(0)
-    #     print("current node", currentNode.heuristic)
-    #     #if current node does not have the answer then expand and create children with possible moves and add them to the queue
-    #     if(currentNode.boardState != finalBoard):
-    #         visitedNodes.append(currentNode)
-    #         children = currentNode.createChildren()
-    #         for i in range(len(children)):
-    #             # print("child")
-    #             # currentNode.printBoardState()
-    #             # print("\n")
-    #             if(checkIfVisited(children[i], visitedNodes) == 0):
-    #                 children[i].checkH2(finalBoard)
-    #                 queue.insert(0, children[i])
-    #
-    #         prioritizeNodes(queue)
-    #     else:
-    #         foundFinalBoard = True
-    #
-    #         print("Found Solution! ")
-    #         return currentNode.returnSolutionMove([])
-    #
-    #     numberOfActions+=1
-
-
+            board = bestNeighbor
+            queenPositions = getQueens(board)
+    return board
 
 
 
@@ -158,5 +131,5 @@ if __name__ == '__main__':
 
     # breadthFirstSearch(edoInicial, edoFinal)
     # dephFirstSearch(edoInicial,edoFinal)
-    print(busquedaHC(5, False, 5))
+    print(busquedaHC(8, True, 5))
     # main()
