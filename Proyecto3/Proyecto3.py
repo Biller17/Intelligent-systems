@@ -25,13 +25,13 @@ def evaluationFunction(board):
         for j in range(len(queenPositions)):
             #checking if there are attacks in x axis
             if(currentQueen[0] == queenPositions[j][0]):
-                heuristic += 2
+                heuristic += 1
             #checking if there are attacks in y axis
             if(currentQueen[1] == queenPositions[j][1]):
-                heuristic += 2
+                heuristic += 1
             #checking if there are diagonal
             if(abs(currentQueen[0] - queenPositions[j][0]) == abs(currentQueen[1] - queenPositions[j][1])):
-                heuristic += 2
+                heuristic += 1
 
     return heuristic
 
@@ -78,50 +78,61 @@ def hillClimbing(N, board, lateral, M):
     queenPositions = getQueens(board)
     bestNeighbor = board
     numOfResets = 0
-    iterations = 1
-    while(evaluation != 0 and iterations > 0):
-        iterations -= 1
+    while(True):
+
+        print("resets", numOfResets)
+        betterBoard = 0
+
         for i in range(len(queenPositions)):
             currentNeighbor = queenPositions.pop(0)
+            print(queenPositions)
             possibleMoves = getPossibleMoves(currentNeighbor, N)
             for j in range(len(possibleMoves)):
                 tempBoard = getNewBoard(currentNeighbor, possibleMoves[j], board)
-                # if(checkIfVisited(visited,tempBoard)):
-                #     reset = True
-                #     continue
+                if(checkIfVisited(visited,tempBoard)):
+                    continue
+                visited.append(tempBoard)
                 neighborEvaluation = evaluationFunction(tempBoard)
-                print("*********************************************************** EVALUATION", neighborEvaluation, "******************************************")
                 print("evaluation", evaluation)
                 print("neighborEvaluation", neighborEvaluation)
                 if(neighborEvaluation <= evaluation and lateral):
                     bestNeighbor = tempBoard
                     evaluation = neighborEvaluation
                     printBoard(tempBoard)
+                    betterBoard = 1
+
                 elif(neighborEvaluation < evaluation):
                     bestNeighbor = tempBoard
                     evaluation = neighborEvaluation
                     printBoard(tempBoard)
-                if(neighborEvaluation == evaluation):
-                    reset = True
+                    betterBoard = 1
+                # elif(numOfResets < M):
+                #     print("_______________________________________________________________RESET_______________________________________________________")
+                #     visited = []
+                #     board = generateBoard(N)
+                #     bestNeighbor = board
+                #     numOfResets += 1
 
-                visited.append(tempBoard)
-        print("old board")
-        printBoard(board)
-        print("best board")
-        printBoard(bestNeighbor)
-        board = bestNeighbor
-
-
-        queenPositions = getQueens(board)
-        if(reset and numOfResets <= M):
-            print("_______________________________________________________________RESET__________________________________________")
+        if(numOfResets == M or evaluation == 0):
+            printBoard(board)
+            print(evaluation)
+            print("Resets done", numOfResets)
+            if(evaluation == 0):
+                print("Found solution!")
+            else:
+                print("Did not find solution")
+            return 0
+        #
+        if(betterBoard == 0 and numOfResets <= M):
+            print("_______________________________________________________________RESET_______________________________________________________")
             visited = []
             board = generateBoard(N)
-            reset = False
+            bestNeighbor = board
             numOfResets += 1
+        else:
+            board = bestNeighbor
+        queenPositions = getQueens(board)
 
-
-    return board
 
 
 
@@ -140,8 +151,4 @@ def busquedaHC(N, lateral, M):
 
 if __name__ == '__main__':
     print("Proyecto 3 N-Reinas Adrian Biller A01018940")
-
-    # breadthFirstSearch(edoInicial, edoFinal)
-    # dephFirstSearch(edoInicial,edoFinal)
-    print(busquedaHC(8, True, 50))
-    # main()
+    busquedaHC(8, True, 5)
