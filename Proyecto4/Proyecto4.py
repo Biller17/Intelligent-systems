@@ -1,7 +1,9 @@
-import os
 import copy
 import random
 
+
+#proyecto4 Othello
+#Adrian Biller A01018940
 
 
 boardsize = 8
@@ -38,7 +40,7 @@ def movePosition(board, x, y, player):
         return False
     #checking the turned chips if making that move
     temp = copy.deepcopy(board)
-    tempBoard, turnedChips = makeMove(temp, x, y, player)
+    tempBoard, turnedChips = playerMove(temp, x, y, player)
     #no turned chips so move is not valid
     if (turnedChips == 0):
         return False
@@ -46,7 +48,7 @@ def movePosition(board, x, y, player):
     return True
 
 
-def makeMove(board, x, y, player_color):
+def playerMove(board, x, y, player_color):
     #directions where chips could be turned
     xDirections = [-1, 0, 1, -1, 1, -1, 0, 1]
     yDirections = [-1, -1, -1, 0, 0, 1, 1, 1]
@@ -108,7 +110,7 @@ def aiTurn(board, player_color):
             if movePosition(board, x, y, player_color):
                 temp = copy.deepcopy(board)
                 #getting temporary board and possible chips turned
-                tempBoard, turnedChips = makeMove(temp, x, y, player_color)
+                tempBoard, turnedChips = playerMove(temp, x, y, player_color)
                 #getting possible points from minimax algorithm
                 points = MinMax(True, tempBoard, player_color, level)
                 if points > maxPoints:
@@ -126,7 +128,7 @@ def MinMax(minOrmax, board, player, level):
             for x in range(boardsize):
                 if movePosition(board, x, y, player):
                     temp = copy.deepcopy(board)
-                    tempBoard, turnedChips = makeMove(temp, x, y, player)
+                    tempBoard, turnedChips = playerMove(temp, x, y, player)
                     #calling recursive algorithm as min
                     newVal = MinMax(False, tempBoard, player, level - 1)
                     #choosing max value
@@ -136,7 +138,7 @@ def MinMax(minOrmax, board, player, level):
             for x in range(boardsize):
                 if movePosition(board, x, y, player):
                     temp = copy.deepcopy(board)
-                    tempBoard, turnedChips = makeMove(temp, x, y, player)
+                    tempBoard, turnedChips = playerMove(temp, x, y, player)
                     #calling recutrsive algorithm as min
                     newVal = MinMax(True, tempBoard, player, level - 1)
 
@@ -206,7 +208,7 @@ def othello(level, fichas, inicia):
                     elif(x == 'H'):
                         x = 7
                     if movePosition(board, x, y, user_color):
-                        board, turnedChips = makeMove(board, x, y, user_color)
+                        board, turnedChips = playerMove(board, x, y, user_color)
                         player = 1
                         printCurrentBoard()
                         break
@@ -217,7 +219,7 @@ def othello(level, fichas, inicia):
                 currentTurn = ai_color
                 x, y = aiTurn(board, ai_color)
                 if(x != -1 and y != -1):
-                    (board, turnedChips) = makeMove(board, x, y, ai_color)
+                    (board, turnedChips) = playerMove(board, x, y, ai_color)
                     player = 0
 
 
